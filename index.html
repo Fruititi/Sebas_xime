@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boda de Sebas & Xime</title>
+    
+    <!-- Tailwind CSS para el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome para Íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wedding-green': '#6b705c',
+                        'wedding-beige': '#f0efe9',
+                        'wedding-gold': '#b89f5d',
+                        'wedding-dark': '#3a3a3a'
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Montserrat"', 'sans-serif'],
+                        script: ['"Great Vibes"', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Animaciones personalizadas */
+        .fade-in { animation: fadeIn 1.5s ease-in-out forwards; }
+        .slide-up { animation: slideUp 1s ease-out forwards; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estilo para imágenes de fondo con overlay */
+        .bg-overlay {
+            position: relative;
+        }
+        .bg-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+        .bg-overlay > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .envelope-bg {
+            /* Fondo abstracto romántico generado con código usando SOLO los colores de tu boda */
+            background-color: #f0efe9;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(184, 159, 93, 0.15) 0%, transparent 60%),
+                radial-gradient(at 90% 20%, rgba(107, 112, 92, 0.15) 0%, transparent 60%),
+                radial-gradient(at 30% 90%, rgba(107, 112, 92, 0.15) 0%, transparent 60%),
+                radial-gradient(at 80% 80%, rgba(184, 159, 93, 0.15) 0%, transparent 60%);
+        }
+        
+        .hero-bg {
+            /* FOTO PRINCIPAL - La foto de Sebas y Xime */
+            background-image: url('https://raw.githubusercontent.com/Fruititi/Sebas_xime/main/xebas_xime_2.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .hidden-scroll {
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-wedding-beige text-wedding-dark font-sans hidden-scroll antialiased selection:bg-wedding-gold selection:text-white">
+
+    <!-- AUDIO DE FONDO -->
+    <audio id="bgMusic" loop>
+        <source src="https://raw.githubusercontent.com/Fruititi/Sebas_xime/main/mi_corazon_encantado.mp3" type="audio/mpeg">
+        Tu navegador no soporta audio.
+    </audio>
+
+    <!-- ========================================== -->
+    <!-- PANTALLA 1: EL SOBRE / PORTADA             -->
+    <!-- ========================================== -->
+    <div id="envelopeScreen" class="fixed inset-0 z-50 flex items-center justify-center envelope-bg transition-all duration-1000 ease-in-out">
+        <div class="bg-white/95 backdrop-blur-sm p-8 md:p-12 rounded-lg shadow-2xl text-center max-w-lg w-11/12 border-4 border-double border-wedding-gold slide-up">
+            <h3 class="text-wedding-gold text-sm tracking-widest uppercase mb-4 font-semibold">Te invitamos a nuestra boda</h3>
+            <h1 class="font-script text-6xl md:text-7xl text-wedding-green mb-6">Sebas & Xime</h1>
+            
+            <div id="guestNameContainer" class="my-8 border-y border-wedding-gold/30 py-6 hidden">
+                <p class="text-sm uppercase tracking-widest text-gray-500 mb-2">Para:</p>
+                <!-- Aquí se inyecta el nombre desde la URL -->
+                <p id="guestNameDisplay" class="font-serif text-3xl font-semibold text-wedding-dark"></p>
+            </div>
+            
+            <p class="font-serif text-xl italic text-gray-700 mb-2 mt-6">
+                "Te esperamos para celebrar contigo nuestra unión ante Dios."
+            </p>
+            <p class="font-serif text-2xl font-bold text-wedding-gold mb-8">¡Nos casamos!</p>
+            
+            <button onclick="openInvitation()" class="bg-wedding-green text-white px-8 py-3 rounded-full hover:bg-wedding-dark transition-colors duration-300 shadow-lg font-semibold uppercase tracking-wider text-sm flex items-center justify-center mx-auto gap-2 group">
+                <i class="fa-regular fa-envelope-open group-hover:scale-110 transition-transform"></i>
+                Abrir Invitación
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- PANTALLA 2: LA INVITACIÓN PRINCIPAL        -->
+    <!-- ========================================== -->
+    <div id="mainInvitation" class="opacity-0 hidden transition-opacity duration-1000">
+
+        <!-- Botón flotante para pausar/reproducir música -->
+        <button onclick="toggleMusic()" id="musicBtn" class="fixed bottom-6 right-6 z-40 bg-wedding-gold text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-yellow-700 transition-colors">
+            <i class="fa-solid fa-music"></i>
+        </button>
+
+        <!-- Hero Section -->
+        <header class="hero-bg bg-overlay h-screen flex flex-col items-center justify-center text-center px-4 relative">
+            <div class="slide-up">
+                <p class="text-white font-sans tracking-[0.3em] uppercase mb-4 text-sm md:text-base text-shadow-md">Nuestra Boda</p>
+                <h1 class="font-script text-7xl md:text-9xl text-white mb-6 drop-shadow-lg">Sebas & Xime</h1>
+                <p class="text-white font-serif text-2xl md:text-3xl italic mb-8">18 de Julio del 2026</p>
+            </div>
+            <!-- Flecha hacia abajo -->
+            <div class="absolute bottom-10 animate-bounce">
+                <i class="fa-solid fa-chevron-down text-white text-3xl opacity-80"></i>
+            </div>
+        </header>
+
+        <!-- Mensaje de Introducción -->
+        <section class="py-20 px-6 max-w-4xl mx-auto text-center fade-in-scroll opacity-0">
+            <i class="fa-solid fa-quote-left text-4xl text-wedding-gold/40 mb-6"></i>
+            <p class="font-serif text-2xl md:text-4xl leading-relaxed text-gray-800">
+                Entre bendiciones, retos superados y un amor que no deja de crecer, hemos decidido dar el paso más importante de nuestras vidas. Estamos felices y emocionados de invitarlos a nuestro matrimonio. <br><br>
+                <span class="text-wedding-gold font-bold">¡Queremos que sean parte de este camino que apenas comienza!</span>
+            </p>
+        </section>
+
+        <!-- Galería de Fotos (Carrusel Interactivo) -->
+        <section class="py-16 px-4 bg-white fade-in-scroll opacity-0">
+            <div class="max-w-5xl mx-auto relative group">
+                <h2 class="font-script text-5xl md:text-6xl text-wedding-green mb-10 text-center">Nuestra Historia</h2>
+                
+                <!-- Contenedor principal del carrusel -->
+                <div class="overflow-hidden rounded-2xl shadow-xl relative bg-wedding-beige h-[400px] md:h-[600px]">
+                    <!-- Slides (Imágenes superpuestas para efecto fade) -->
+                    <div id="carouselSlides" class="w-full h-full relative">
+                        <!-- FOTO 1 -->
+                        <div class="carousel-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-100 z-10">
+                            <img src="https://raw.githubusercontent.com/Fruititi/Sebas_xime/main/sebas_xime_3.jpeg" alt="Sebas y Xime 1" class="w-full h-full object-cover">
+                        </div>
+                        <!-- FOTO 2 -->
+                        <div class="carousel-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0 z-0">
+                            <img src="https://raw.githubusercontent.com/Fruititi/Sebas_xime/main/sebas_xime_4.jpeg" alt="Sebas y Xime 2" class="w-full h-full object-cover object-top">
+                        </div>
+                        <!-- FOTO 3 -->
+                        <div class="carousel-item absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0 z-0">
+                            <img src="https://raw.githubusercontent.com/Fruititi/Sebas_xime/main/sebas_xime_2.png" alt="Sebas y Xime 3" class="w-full h-full object-cover object-top">
+                        </div>
+                    </div>
+
+                    <!-- Controles: Anterior / Siguiente -->
+                    <button onclick="prevSlide()" class="absolute top-1/2 left-4 -translate-y-1/2 bg-white/80 hover:bg-white text-wedding-dark w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all opacity-100 md:opacity-0 group-hover:opacity-100 z-20 hover:scale-110 cursor-pointer">
+                        <i class="fa-solid fa-chevron-left text-xl"></i>
+                    </button>
+                    <button onclick="nextSlide()" class="absolute top-1/2 right-4 -translate-y-1/2 bg-white/80 hover:bg-white text-wedding-dark w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all opacity-100 md:opacity-0 group-hover:opacity-100 z-20 hover:scale-110 cursor-pointer">
+                        <i class="fa-solid fa-chevron-right text-xl"></i>
+                    </button>
+
+                    <!-- Indicadores (Puntos) -->
+                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+                        <button onclick="goToSlide(0)" class="carousel-dot w-4 h-4 rounded-full bg-white shadow-md transition-all opacity-100 hover:scale-110"></button>
+                        <button onclick="goToSlide(1)" class="carousel-dot w-4 h-4 rounded-full bg-white shadow-md transition-all opacity-50 hover:scale-110"></button>
+                        <button onclick="goToSlide(2)" class="carousel-dot w-4 h-4 rounded-full bg-white shadow-md transition-all opacity-50 hover:scale-110"></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contador Regresivo -->
+        <section class="bg-wedding-green text-white py-16 px-4 text-center">
+            <h2 class="font-serif text-3xl md:text-4xl mb-10">Faltan</h2>
+            <div class="flex justify-center gap-4 md:gap-10 max-w-3xl mx-auto" id="countdown">
+                <div class="flex flex-col items-center">
+                    <span id="days" class="text-4xl md:text-6xl font-serif font-bold">00</span>
+                    <span class="text-xs md:text-sm uppercase tracking-widest mt-2">Días</span>
+                </div>
+                <div class="text-4xl md:text-6xl font-serif font-light">:</div>
+                <div class="flex flex-col items-center">
+                    <span id="hours" class="text-4xl md:text-6xl font-serif font-bold">00</span>
+                    <span class="text-xs md:text-sm uppercase tracking-widest mt-2">Horas</span>
+                </div>
+                <div class="text-4xl md:text-6xl font-serif font-light hidden sm:block">:</div>
+                <div class="flex flex-col items-center hidden sm:flex">
+                    <span id="minutes" class="text-4xl md:text-6xl font-serif font-bold">00</span>
+                    <span class="text-xs md:text-sm uppercase tracking-widest mt-2">Minutos</span>
+                </div>
+            </div>
+            <p class="mt-8 font-serif text-xl italic">Guarda la fecha: 18/07/2026</p>
+        </section>
+
+        <!-- Detalles del Evento (Ceremonia y Recepción) -->
+        <section class="py-20 px-4 bg-white">
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12">
+                
+                <!-- Ceremonia -->
+                <div class="text-center p-8 bg-wedding-beige/50 rounded-2xl shadow-sm hover:shadow-md transition-shadow fade-in-scroll opacity-0 flex flex-col">
+                    <div class="w-16 h-16 bg-wedding-gold text-white rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-lg">
+                        <i class="fa-solid fa-church"></i>
+                    </div>
+                    <h3 class="font-serif text-3xl mb-2 text-wedding-green font-bold">Ceremonia Católica</h3>
+                    <p class="font-sans uppercase tracking-widest text-sm mb-6">18 de Julio del 2026</p>
+                    
+                    <div class="font-serif text-xl space-y-2 mb-8 flex-grow">
+                        <p class="font-bold text-2xl"><i class="fa-regular fa-clock mr-2 text-wedding-gold"></i> 02:30 P.M.</p>
+                        <p class="font-bold">Parroquia Santa Teresa del Niño Jesús</p>
+                        <p class="text-gray-600">Santágueda, Palestina, Caldas</p>
+                    </div>
+                    
+                    <div class="mt-auto">
+                        <a href="https://maps.app.goo.gl/w5Lk4ou5H1HYDP6q7" target="_blank" class="inline-block bg-wedding-green text-white px-6 py-3 rounded-full uppercase tracking-wider text-sm hover:bg-wedding-dark transition-colors">
+                            <i class="fa-solid fa-map-location-dot mr-2"></i> Ver Mapa
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recepción -->
+                <div class="text-center p-8 bg-wedding-beige/50 rounded-2xl shadow-sm hover:shadow-md transition-shadow fade-in-scroll opacity-0 flex flex-col" style="transition-delay: 200ms;">
+                    <div class="w-16 h-16 bg-wedding-gold text-white rounded-full flex items-center justify-center mx-auto mb-6 text-2xl shadow-lg">
+                        <i class="fa-solid fa-champagne-glasses"></i>
+                    </div>
+                    <h3 class="font-serif text-3xl mb-2 text-wedding-green font-bold">Recepción</h3>
+                    <p class="font-sans uppercase tracking-widest text-sm mb-6">Celebración y Fiesta</p>
+                    
+                    <div class="font-serif text-xl space-y-2 mb-8 flex-grow">
+                        <p class="font-bold text-2xl"><i class="fa-regular fa-clock mr-2 text-wedding-gold"></i> 05:00 P.M.</p>
+                        <p class="font-bold">Hotel Campestre Villa Beatriz</p>
+                        <p class="text-gray-600">Santágueda, Palestina, Caldas</p>
+                    </div>
+                    
+                    <div class="mt-auto">
+                        <a href="https://maps.app.goo.gl/nv4B1AxceHnUoYrx8" target="_blank" class="inline-block bg-wedding-green text-white px-6 py-3 rounded-full uppercase tracking-wider text-sm hover:bg-wedding-dark transition-colors">
+                            <i class="fa-solid fa-map-location-dot mr-2"></i> Ver Mapa
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Código de Vestimenta -->
+        <section class="py-20 px-4 bg-stone-100 text-center fade-in-scroll opacity-0">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="font-script text-5xl md:text-6xl text-wedding-green mb-6">Código de Vestimenta</h2>
+                <p class="font-serif text-xl mb-12 text-gray-700">
+                    El lugar del evento se ubica en el corazón del eje cafetero y el clima es cálido, por eso los invitamos a disfrutar el ambiente de la siguiente manera:
+                </p>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-12">
+                    <div class="bg-white p-8 rounded-xl shadow-sm border-t-4 border-wedding-gold">
+                        <i class="fa-solid fa-user-tie text-4xl text-wedding-gold mb-4"></i>
+                        <h3 class="font-serif text-2xl font-bold mb-4">Hombres</h3>
+                        <p class="uppercase tracking-wide text-sm text-gray-600">Camisa guayabera blanca<br>y pantalón beige o café claro</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-sm border-t-4 border-wedding-gold">
+                        <i class="fa-solid fa-person-dress text-4xl text-wedding-gold mb-4"></i>
+                        <h3 class="font-serif text-2xl font-bold mb-4">Mujeres</h3>
+                        <p class="uppercase tracking-wide text-sm text-gray-600">Vestido largo<br>estampado de flores</p>
+                    </div>
+                </div>
+
+                <!-- Nueva caja de colores reservados (Elegante y armónica) -->
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-wedding-gold/30 inline-block w-full max-w-2xl mx-auto">
+                    <h4 class="font-serif text-3xl text-wedding-dark mb-3">Colores Reservados</h4>
+                    <p class="font-sans text-sm text-gray-500 mb-8 px-4">Agradecemos de corazón evitar los siguientes tonos, ya que están reservados para los novios.</p>
+                    
+                    <div class="flex flex-wrap justify-center gap-6 md:gap-12 mb-4">
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-sm mb-3 relative flex items-center justify-center">
+                                <i class="fa-solid fa-xmark text-gray-300 absolute text-xl"></i>
+                            </div>
+                            <span class="text-[11px] uppercase tracking-widest font-semibold text-gray-500">Blanco</span>
+                        </div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-full bg-slate-800 shadow-sm mb-3 relative flex items-center justify-center">
+                                <i class="fa-solid fa-xmark text-white/40 absolute text-xl"></i>
+                            </div>
+                            <span class="text-[11px] uppercase tracking-widest font-semibold text-gray-500">Azul Oscuro</span>
+                        </div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-full bg-yellow-100 border border-yellow-200/50 shadow-sm mb-3 relative flex items-center justify-center">
+                                <i class="fa-solid fa-xmark text-yellow-600/40 absolute text-xl"></i>
+                            </div>
+                            <span class="text-[11px] uppercase tracking-widest font-semibold text-gray-500">Amarillo Claro</span>
+                        </div>
+                        
+                        <div class="flex flex-col items-center">
+                            <div class="w-12 h-12 rounded-full bg-[#E5C9A4] border border-[#d3b48c]/40 shadow-sm mb-3 relative flex items-center justify-center">
+                                <i class="fa-solid fa-xmark text-white/90 absolute text-xl"></i>
+                            </div>
+                            <span class="text-[11px] uppercase tracking-widest font-semibold text-gray-500">Habano</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Alojamiento -->
+        <section class="py-20 px-4 bg-wedding-green text-white text-center fade-in-scroll opacity-0">
+            <div class="max-w-4xl mx-auto">
+                <i class="fa-solid fa-sun text-4xl text-yellow-300 mb-6"></i>
+                <h2 class="font-serif text-4xl md:text-5xl mb-6 font-bold">¡Quédense con nosotros en Santágueda!</h2>
+                <p class="font-sans font-light text-lg mb-8 leading-relaxed">
+                    El clima y el paisaje son ideales para celebrar. Si vienen de fuera o quieren descansar después de la recepción, tenemos como sugerencia de estadía el sitio del evento, <strong>HOTEL CAMPESTRE VILLA BEATRIZ</strong>; así disfrutaremos también juntos al día siguiente.
+                </p>
+                <div class="bg-white/10 p-6 rounded-xl border border-white/20 mb-8 backdrop-blur-sm">
+                    <ul class="font-serif text-xl space-y-2">
+                        <li><i class="fa-solid fa-bed mr-2 text-wedding-gold"></i> Habitaciones de pareja</li>
+                        <li><i class="fa-solid fa-users mr-2 text-wedding-gold"></i> Grupos de 4 y 6 personas</li>
+                        <li><i class="fa-solid fa-house mr-2 text-wedding-gold"></i> Cabañas de hasta 14 personas</li>
+                    </ul>
+                </div>
+                <p class="text-sm uppercase tracking-widest text-wedding-beige">
+                    * Para garantizar el precio especial, reserva con nuestro Wedding Planner (datos al final).
+                </p>
+            </div>
+        </section>
+
+        <!-- Sugerencia de Regalos -->
+        <section class="py-20 px-4 text-center bg-white fade-in-scroll opacity-0">
+            <div class="max-w-3xl mx-auto">
+                <h2 class="font-script text-5xl md:text-6xl text-wedding-green mb-4">Sugerencia de Regalos</h2>
+                <h3 class="font-sans uppercase tracking-widest text-wedding-gold font-bold mb-8">Lluvia de Sobres</h3>
+                <p class="font-serif text-xl text-gray-700 leading-relaxed mb-8">
+                    Estamos comenzando un nuevo camino, tu presencia es nuestro mejor regalo; si además deseas apoyarnos con un detalle, una lluvia de sobres sería de gran ayuda para nuestros primeros pasos como esposos. Tendremos un buzón el día del evento.
+                </p>
+                <div class="inline-flex flex-col items-center bg-gray-50 p-8 rounded-2xl border border-gray-200">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/DaviPlata_logo.png" alt="Daviplata" class="h-8 mb-4 opacity-80" onerror="this.style.display='none'">
+                    <i class="fa-solid fa-mobile-screen-button text-3xl text-red-500 mb-2"></i>
+                    <p class="font-sans font-bold text-gray-500 uppercase text-sm mb-1">Daviplata</p>
+                    <p class="font-serif text-3xl font-bold text-wedding-dark">311 692 7850</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Información Importante (Adultos / Restricciones) -->
+        <section class="py-16 px-4 bg-wedding-beige border-y border-wedding-gold/20 fade-in-scroll opacity-0">
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+                
+                <!-- Adultos -->
+                <div class="bg-white p-8 rounded-xl shadow-sm text-center">
+                    <i class="fa-solid fa-children text-3xl text-gray-400 mb-4 line-through"></i>
+                    <h3 class="font-serif text-2xl font-bold text-wedding-dark mb-4">Solo Adultos</h3>
+                    <p class="text-gray-600">Amamos a los más pequeños, pero para nuestra boda hemos decidido tener un ambiente exclusivamente de adultos. Esperamos que este aviso con tiempo les permita organizar su noche y acompañarnos a celebrar.</p>
+                </div>
+
+                <!-- Alimentación -->
+                <div class="bg-white p-8 rounded-xl shadow-sm text-center">
+                    <i class="fa-solid fa-utensils text-3xl text-wedding-gold mb-4"></i>
+                    <h3 class="font-serif text-2xl font-bold text-wedding-dark mb-4">Menú</h3>
+                    <p class="text-gray-600 mb-6">¿Eres alérgico(a) a algún alimento o eres vegetariano(a)? Por favor déjanos saber para prepararnos adecuadamente.</p>
+                    <a href="#" target="_blank" class="text-wedding-green font-bold underline hover:text-wedding-dark">Completar formulario de menú</a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- RSVP (Confirmación de asistencia) -->
+        <section class="py-24 px-4 bg-stone-100 text-center relative overflow-hidden">
+            <!-- Decoración fondo -->
+            <i class="fa-solid fa-leaf absolute -bottom-10 -left-10 text-9xl text-stone-200 opacity-50 transform -rotate-45"></i>
+            <i class="fa-solid fa-leaf absolute -top-10 -right-10 text-9xl text-stone-200 opacity-50 transform rotate-135"></i>
+            
+            <div class="max-w-4xl mx-auto relative z-10 fade-in-scroll opacity-0">
+                <h2 class="font-script text-6xl text-wedding-green mb-6">Confirmación de Asistencia</h2>
+                <p class="font-serif text-xl text-gray-700 mb-8 bg-white/60 p-6 rounded-lg backdrop-blur-sm shadow-sm inline-block">
+                    <strong>RSVP:</strong> Para nosotros es muy importante contar con tu presencia.<br>
+                    Te agradecemos confirmar antes del <strong class="text-wedding-gold text-2xl">30 de abril</strong>.<br>
+                    <span class="text-sm mt-2 block">Si no logras confirmarnos para entonces, entenderemos que no podrás acompañarnos. ¡Ojalá puedas estar!</span>
+                </p>
+
+                <p class="mb-8 text-gray-600">Haz clic en una de las opciones. Se abrirá un mensaje automático en WhatsApp:</p>
+
+                <div class="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
+                    <!-- Botón SI -->
+                    <a href="https://wa.me/573234113020?text=Hola%20Xime%20y%20sebas%2C%20con%20alegr%C3%ADa%20les%20informo%20que%20confirmo%20mi%20asistencia%20a%20la%20boda%2C%20mi%20nombre%20completo%20es%20___%20y%20mi%20celular%20___" 
+                       target="_blank"
+                       class="bg-wedding-green text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-green-700 hover:scale-105 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-xl"></i> ¡Sí, asistiré!
+                    </a>
+                    
+                    <!-- Botón NO -->
+                    <a href="https://wa.me/573234113020?text=Hola%20XIME%20Y%20SEBAS%2C%20lamentablemente%20no%20podr%C3%A9%20acompa%C3%B1arlos%20en%20la%20boda%2C%20les%20env%C3%ADo%20mis%20mejores%20deseos%2C%20___(nombre%20completo%20por%20favor)___" 
+                       target="_blank"
+                       class="bg-white text-gray-700 border-2 border-gray-300 px-8 py-4 rounded-full font-bold shadow-md hover:bg-gray-50 hover:border-gray-400 hover:scale-105 transition-all flex items-center justify-center gap-2">
+                        No podré asistir
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer / Wedding Planner -->
+        <footer class="bg-wedding-dark text-white py-12 text-center px-4">
+            <h1 class="font-script text-4xl text-wedding-gold mb-6">Sebas & Xime</h1>
+            <div class="max-w-xl mx-auto border-t border-gray-700 pt-8">
+                <p class="uppercase tracking-widest text-xs mb-2 text-gray-400">¿Tienes alguna duda?</p>
+                <p class="font-serif text-lg mb-4">
+                    Para cualquier duda, confirmación de hospedaje o detalle logístico, nuestro Wedding Planner estará encantado de ayudarte. Queremos que tu única preocupación sea disfrutar con nosotros.
+                </p>
+                <p class="font-bold text-wedding-gold"><i class="fa-solid fa-user-tie mr-2"></i> CARLOS ANDRÉS DUQUE</p>
+                <a href="https://wa.me/573234113020" target="_blank" class="inline-block mt-2 text-white hover:text-wedding-gold transition-colors">
+                    <i class="fa-brands fa-whatsapp mr-1"></i> +57 323 411 3020
+                </a>
+            </div>
+            <p class="text-xs text-gray-500 mt-12">&copy; 2026 Sebas & Xime. Todos los derechos reservados.</p>
+        </footer>
+
+    </div>
+
+    <!-- Scripts para Interactividad -->
+    <script>
+        // 1. Capturar nombre de la URL (?nombre=...)
+        document.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            let guestName = urlParams.get('nombre');
+            
+            if (guestName) {
+                // Decodificar si vienen caracteres especiales y asignar
+                document.getElementById('guestNameDisplay').textContent = decodeURIComponent(guestName);
+                document.getElementById('guestNameContainer').classList.remove('hidden');
+            }
+        });
+
+        // 2. Lógica para abrir la invitación
+        function openInvitation() {
+            const envelope = document.getElementById('envelopeScreen');
+            const mainContent = document.getElementById('mainInvitation');
+            
+            // Reproducir música (Importante: Requiere interacción del usuario, por eso va en este click)
+            const audio = document.getElementById('bgMusic');
+            audio.volume = 0.5; // Volumen al 50%
+            audio.play().catch(error => console.log("Auto-play bloqueado o archivo no encontrado."));
+
+            // Desvanecer sobre
+            envelope.style.opacity = '0';
+            
+            setTimeout(() => {
+                envelope.classList.add('hidden');
+                document.body.classList.remove('hidden-scroll');
+                
+                // Mostrar y animar contenido principal
+                mainContent.classList.remove('hidden');
+                setTimeout(() => {
+                    mainContent.classList.add('opacity-100');
+                    startCountdown(); // Iniciar contador
+                    initScrollAnimations(); // Iniciar animaciones de scroll
+                    resetCarouselInterval(); // Iniciar carrusel automático
+                }, 100);
+            }, 1000);
+        }
+
+        // 3. Controlar Música (Botón flotante)
+        let isPlaying = true;
+        function toggleMusic() {
+            const audio = document.getElementById('bgMusic');
+            const icon = document.querySelector('#musicBtn i');
+            
+            if (isPlaying) {
+                audio.pause();
+                icon.classList.remove('fa-music');
+                icon.classList.add('fa-volume-xmark');
+            } else {
+                audio.play();
+                icon.classList.remove('fa-volume-xmark');
+                icon.classList.add('fa-music');
+            }
+            isPlaying = !isPlaying;
+        }
+
+        // 4. Contador Regresivo
+        function startCountdown() {
+            // Fecha objetivo: 18 de Julio del 2026, 14:30:00 (2:30 PM)
+            const countDownDate = new Date("Jul 18, 2026 14:30:00").getTime();
+
+            const x = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = countDownDate - now;
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+                document.getElementById("days").innerHTML = days.toString().padStart(2, '0');
+                document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
+                document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
+
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("countdown").innerHTML = "<div class='text-4xl font-script'>¡El gran día ha llegado!</div>";
+                }
+            }, 1000);
+        }
+
+        // 5. Animaciones al hacer Scroll
+        function initScrollAnimations() {
+            const elements = document.querySelectorAll('.fade-in-scroll');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('slide-up');
+                        entry.target.classList.remove('opacity-0');
+                        observer.unobserve(entry.target); // Animar solo una vez
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            elements.forEach(el => observer.observe(el));
+        }
+
+        // 6. Lógica del Carrusel de Fotos
+        let currentSlide = 0;
+        const totalSlides = 3; // Tenemos 3 fotos en el carrusel
+        let carouselInterval;
+
+        function updateCarousel() {
+            const slides = document.querySelectorAll('.carousel-item');
+            const dots = document.querySelectorAll('.carousel-dot');
+            
+            // Efecto Fade: cambiar opacidad y z-index en lugar de mover
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.remove('opacity-0', 'z-0');
+                    slide.classList.add('opacity-100', 'z-10');
+                } else {
+                    slide.classList.remove('opacity-100', 'z-10');
+                    slide.classList.add('opacity-0', 'z-0');
+                }
+            });
+            
+            // Actualizar estilo de los puntos (indicadores)
+            dots.forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.remove('opacity-50');
+                    dot.classList.add('opacity-100', 'scale-110');
+                } else {
+                    dot.classList.add('opacity-50');
+                    dot.classList.remove('opacity-100', 'scale-110');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateCarousel();
+            resetCarouselInterval(); // Reiniciar el temporizador para no interrumpir el auto-play abruptamente
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            updateCarousel();
+            resetCarouselInterval();
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateCarousel();
+            resetCarouselInterval();
+        }
+
+        function resetCarouselInterval() {
+            clearInterval(carouselInterval);
+            // Auto-avanzar cada 5 segundos
+            carouselInterval = setInterval(nextSlide, 5000);
+        }
+    </script>
+</body>
+</html>
