@@ -34,6 +34,10 @@
     </script>
 
     <style>
+        /* Base resets for iOS */
+        * { -webkit-tap-highlight-color: transparent; }
+        input, button, a { touch-action: manipulation; }
+
         .fade-in { animation: fadeIn 1.5s ease-in-out forwards; }
         .slide-up { animation: slideUp 1s ease-out forwards; }
         
@@ -71,11 +75,21 @@
                 radial-gradient(at 80% 80%, rgba(184, 159, 93, 0.15) 0%, transparent 60%);
         }
         
+        /* background-attachment: fixed breaks on iOS Safari — use scroll always */
         .hero-bg {
             background-image: url('https://raw.githubusercontent.com/Fruititi/Sebas_xime/main/xebas_xime_2.png');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
+            background-attachment: scroll;
+        }
+
+        /* On larger screens restore parallax effect */
+        @supports not (-webkit-overflow-scrolling: touch) {
+            @media (min-width: 1024px) {
+                .hero-bg {
+                    background-attachment: fixed;
+                }
+            }
         }
 
         .hidden-scroll {
@@ -93,12 +107,44 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+            /* Prevents blurry images on Retina/high-DPI screens */
+            image-rendering: -webkit-optimize-contrast;
         }
 
-        @media (max-width: 640px) {
-            .hero-bg {
-                background-attachment: scroll;
-            }
+        /* Music button — visible and tappable on mobile */
+        #musicBtn {
+            /* Ensure 44px minimum tap target (Apple HIG) */
+            min-width: 48px;
+            min-height: 48px;
+            /* Keep above everything on iOS */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
+        /* Music button pulsing ring when playing */
+        #musicBtn.is-playing::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 9999px;
+            border: 2px solid rgba(184,159,93,0.5);
+            animation: pulse-ring 2s ease-out infinite;
+        }
+        @keyframes pulse-ring {
+            0%   { transform: scale(1);   opacity: 0.8; }
+            100% { transform: scale(1.5); opacity: 0;   }
+        }
+
+        /* Smooth font rendering on mobile */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Fix 100vh on iOS (browser chrome eats space) */
+        .h-screen-safe {
+            height: 100vh;
+            height: -webkit-fill-available;
         }
     </style>
 </head>
@@ -139,12 +185,12 @@
     <!-- ========================================== -->
     <div id="mainInvitation" class="opacity-0 hidden transition-opacity duration-1000">
 
-        <button onclick="toggleMusic()" id="musicBtn" class="fixed bottom-6 right-6 z-40 bg-wedding-gold text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-yellow-700 transition-colors">
+        <button onclick="toggleMusic()" id="musicBtn" class="fixed bottom-6 right-6 z-40 bg-wedding-gold text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-yellow-700 transition-colors is-playing" style="position:fixed;">
             <i class="fa-solid fa-music"></i>
         </button>
 
         <!-- Hero Section -->
-        <header class="hero-bg bg-overlay h-screen flex flex-col items-center justify-center text-center px-4 relative">
+        <header class="hero-bg bg-overlay h-screen h-screen-safe flex flex-col items-center justify-center text-center px-4 relative">
             <div class="slide-up">
                 <p class="text-white font-sans tracking-[0.3em] uppercase mb-4 text-sm md:text-base text-shadow-md">Nuestra Boda</p>
                 <h1 class="font-script text-7xl md:text-9xl text-white mb-6 drop-shadow-lg">Sebas & Xime</h1>
@@ -157,7 +203,7 @@
 
         <!-- Mensaje de Introducción -->
         <section class="py-20 px-6 max-w-4xl mx-auto text-center fade-in-scroll opacity-0">
-            <i class="fa-solid fa-quote-left text-4xl text-wedding-gold/40 mb-6"></i>
+            <i class="fa-solid fa-heart text-4xl text-wedding-gold/40 mb-6"></i>
             <p class="font-serif text-2xl md:text-4xl leading-relaxed text-gray-800">
                 Entre bendiciones, retos superados y un amor que no deja de crecer, hemos decidido dar el paso más importante de nuestras vidas. Estamos felices y emocionados de invitarlos a nuestro matrimonio. <br><br>
                 <span class="text-wedding-gold font-bold">¡Queremos que sean parte de este camino que apenas comienza!</span>
@@ -407,7 +453,7 @@
                 <div class="bg-white p-8 rounded-xl shadow-sm text-center">
                     <i class="fa-solid fa-utensils text-3xl text-wedding-gold mb-4"></i>
                     <h3 class="font-serif text-2xl font-bold text-wedding-dark mb-4">Menú y Alergias</h3>
-                    <p class="text-gray-600">¿Eres alérgico(a) a algún alimento o eres vegetariano(a)? Por favor déjanos saber para prepararnos adecuadamente. Puedes indicarlo al hacer tu confirmación de asistencia.</p>
+                    <p class="text-gray-600">¿Eres alérgico(a) a algún alimento o eres vegetariano(a)? Puedes indicarlo al hacer tu confirmación de asistencia.</p>
                 </div>
 
             </div>
@@ -422,7 +468,7 @@
                 <h2 class="font-script text-6xl text-wedding-green mb-6">Confirmación de Asistencia</h2>
                 <p class="font-serif text-xl text-gray-700 mb-8 bg-white/60 p-6 rounded-lg backdrop-blur-sm shadow-sm inline-block">
                     <strong>RSVP:</strong> Para nosotros es muy importante contar con tu presencia.<br>
-                    Te agradecemos confirmar antes del <strong class="text-wedding-gold text-2xl">30 de abril</strong>.<br>
+                    Te agradecemos confirmar antes del <strong class="text-wedding-gold text-2xl">15 de mayo</strong>.<br>
                     <span class="text-sm mt-2 block">Si no logras confirmarnos para entonces, entenderemos que no podrás acompañarnos. ¡Ojalá puedas estar!</span>
                 </p>
 
@@ -473,9 +519,25 @@
             const envelope = document.getElementById('envelopeScreen');
             const mainContent = document.getElementById('mainInvitation');
             
+            // Attempt audio play — on iOS this MUST happen inside a user gesture (this click qualifies)
             const audio = document.getElementById('bgMusic');
             audio.volume = 0.5;
-            audio.play().catch(error => console.log("Auto-play bloqueado o archivo no encontrado."));
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        // Audio playing — mark button as playing
+                        document.getElementById('musicBtn').classList.add('is-playing');
+                    })
+                    .catch(() => {
+                        // Blocked (e.g. some Android WebViews) — show muted state so user can tap to play
+                        const btn = document.getElementById('musicBtn');
+                        btn.classList.remove('is-playing');
+                        const icon = btn.querySelector('i');
+                        icon.classList.remove('fa-music');
+                        icon.classList.add('fa-volume-xmark');
+                    });
+            }
 
             envelope.style.opacity = '0';
             
@@ -493,22 +555,25 @@
             }, 1000);
         }
 
-        // 3. Controlar Música
-        let isPlaying = true;
+        // 3. Controlar Música — reads actual audio state, never desync
         function toggleMusic() {
             const audio = document.getElementById('bgMusic');
-            const icon = document.querySelector('#musicBtn i');
+            const btn = document.getElementById('musicBtn');
+            const icon = btn.querySelector('i');
             
-            if (isPlaying) {
+            if (!audio.paused) {
+                // Currently playing → pause it
                 audio.pause();
+                btn.classList.remove('is-playing');
                 icon.classList.remove('fa-music');
                 icon.classList.add('fa-volume-xmark');
             } else {
-                audio.play();
+                // Currently paused → play it
+                audio.play().catch(() => {});
+                btn.classList.add('is-playing');
                 icon.classList.remove('fa-volume-xmark');
                 icon.classList.add('fa-music');
             }
-            isPlaying = !isPlaying;
         }
 
         // 4. Contador Regresivo
