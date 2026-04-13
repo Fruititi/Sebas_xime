@@ -646,27 +646,38 @@
             });
         }
 
+        // Called by the auto-interval only — no resetCarouselInterval here
+        function autoNextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            updateCarousel();
+        }
+
         function nextSlide() {
             currentSlide = (currentSlide + 1) % totalSlides;
             updateCarousel();
-            resetCarouselInterval();
+            startCarouselInterval(); // restart timer after manual interaction
         }
 
         function prevSlide() {
             currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
             updateCarousel();
-            resetCarouselInterval();
+            startCarouselInterval();
         }
 
         function goToSlide(index) {
             currentSlide = index;
             updateCarousel();
-            resetCarouselInterval();
+            startCarouselInterval();
         }
 
-        function resetCarouselInterval() {
+        function startCarouselInterval() {
             clearInterval(carouselInterval);
-            carouselInterval = setInterval(nextSlide, 5000);
+            carouselInterval = setInterval(autoNextSlide, 5000);
+        }
+
+        // Alias used by openInvitation
+        function resetCarouselInterval() {
+            startCarouselInterval();
         }
     </script>
 </body>
